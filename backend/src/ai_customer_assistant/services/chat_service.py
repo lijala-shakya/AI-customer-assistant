@@ -43,7 +43,7 @@ from agents.knowledge.graph import build_knowledge_agent_graph
 from agents.knowledge.providers import build_knowledge_provider, llm_completions
 from agents.supervisor.graph import build_supervisor_graph
 from agents.supervisor.llm_client import SupervisorLLMClient, build_llm_client
-from agents.ticket_agent.store import TicketStore
+from agents.ticket_agent.store import PostgresTicketStore, TicketStore
 from db.checkpointer import build_checkpointer
 from services.embeddings import SharedEmbeddings
 
@@ -177,6 +177,8 @@ class ChatService:
             question = payload.get("question")
             if question:
                 return str(question)
+            if payload.get("type") == "ticket-reason":
+                return "Please briefly describe why you need to create this ticket."
             if payload.get("type") == "email-collection":
                 return _EMAIL_COLLECTION_QUESTION
         return str(payload)
@@ -219,7 +221,14 @@ async def build_chat_service(
         llm_client=resolved_client,
         knowledge_graph=knowledge_graph,
         safety_gate_node=safety_gate_node,
-        ticket_ops=TicketStore(),
+        # Real application runs receive a session factory and persist tickets
+        # to PostgreSQL.  Keep the in-memory store for isolated tests that do
+        # not provision a database.
+        ticket_ops=(
+            PostgresTicketStore(session_factory)
+            if session_factory is not None
+            else TicketStore()
+        ),
         checkpointer=resolved_checkpointer,
     )
     resolved_embedding = (

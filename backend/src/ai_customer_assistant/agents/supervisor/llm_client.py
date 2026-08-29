@@ -148,7 +148,7 @@ class GroqSupervisorLLMClient:
     def __init__(
         self,
         api_key: Optional[str] = None,
-        model: str = "openai/gpt-oss-120b",
+        model: Optional[str] = None,
         timeout: float = 15.0,
     ) -> None:
         resolved_key = api_key or os.environ.get("GROQ_API_KEY")
@@ -156,7 +156,7 @@ class GroqSupervisorLLMClient:
             raise ValueError("GROQ_API_KEY not set.")
 
         self.client = Groq(api_key=resolved_key)
-        self.model = model
+        self.model = model or os.environ.get("GROQ_MODEL", "openai/gpt-oss-120b")
         self.timeout = timeout
 
     def classify(

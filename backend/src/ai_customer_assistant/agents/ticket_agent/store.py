@@ -17,9 +17,15 @@ the adapter only ever sees the store's ``create_ticket(...)``.
 
 from __future__ import annotations
 
+from uuid import UUID
+
+from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
+
 from agents.ticket_agent.ticket_agent import call as _call
 from agents.ticket_agent.ticket_agent import create_ticket as _build_ticket
 from agents.ticket_agent.types import PendingTicket, Ticket
+from db.models import Ticket as TicketRecord
+from services.ticket_verification import EmailSettings, SMTPEmailSender, TicketVerificationService
 
 
 class TicketStore:
@@ -71,6 +77,61 @@ class TicketStore:
 
         ticket = _build_ticket(pending, email)
         self.rows.append(ticket)
+        if idempotency_key is not None:
+            self._by_key[idempotency_key] = ticket
+        return ticket
+
+
+class PostgresTicketStore:
+    """Ticket persistence adapter used by the running application.
+
+    The ticket agent still owns validation and UUID generation.  This class
+    owns the I/O boundary: it writes the completed ticket to PostgreSQL, then
+    retains a small per-process idempotency cache for retry protection during
+    the current server lifetime.
+    """
+
+    def __init__(self, session_factory: async_sessionmaker[AsyncSession]) -> None:
+        self._session_factory = session_factory
+        self._by_key: dict[str, Ticket] = {}
+        self._verification = TicketVerificationService(
+            session_factory, SMTPEmailSender(EmailSettings())
+        )
+
+    def call(self, query: str) -> PendingTicket:
+        return _call(query)
+
+    async def request_verification(
+        self, pending: PendingTicket, email: str, *, thread_id: str
+    ) -> str:
+        """Email a one-time link; ticket creation happens only after click."""
+        return await self._verification.request(pending, email, thread_id=thread_id)
+
+    def next_sequence(self, scope: str) -> int:
+        return sum(1 for key in self._by_key if key.startswith(f"{scope}:"))
+
+    async def create_ticket(
+        self,
+        pending: PendingTicket,
+        email: str,
+        idempotency_key: str | None = None,
+    ) -> Ticket:
+        if idempotency_key is not None and idempotency_key in self._by_key:
+            return self._by_key[idempotency_key]
+
+        ticket = _build_ticket(pending, email)
+        async with self._session_factory() as session:
+            session.add(
+                TicketRecord(
+                    ticket_id=UUID(ticket.ticket_id),
+                    email=ticket.email,
+                    query=ticket.query,
+                    priority=ticket.priority,
+                    status="OPEN",
+                )
+            )
+            await session.commit()
+
         if idempotency_key is not None:
             self._by_key[idempotency_key] = ticket
         return ticket

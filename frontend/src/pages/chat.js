@@ -51,8 +51,10 @@
 
   function init(container) {
     load();
+    var linkedThreadId = linkedThread();
     var current = null;
-    if (activeId) current = thread(activeId);
+    if (linkedThreadId) current = ensureThread(linkedThreadId);
+    if (!current && activeId) current = thread(activeId);
     if (!current && threads.length) current = threads[0];
     if (!current) current = newThread();
     activeId = current.id;
@@ -60,6 +62,11 @@
     renderThreadList();
     renderMessages();
     focusComposer();
+  }
+
+  function linkedThread() {
+    var match = String(location.hash || '').match(/[?&]thread_id=([^&]+)/);
+    return match ? decodeURIComponent(match[1]) : null;
   }
 
   function destroy() {

@@ -18,6 +18,7 @@ from db.checkpointer import build_checkpointer
 from db.session import get_async_session_factory
 from services.chat_service import build_chat_service
 from services.embeddings import build_shared_embeddings
+from services.ticket_verification import EmailSettings, SMTPEmailSender, TicketVerificationService
 
 logger = logging.getLogger(__name__)
 
@@ -29,6 +30,9 @@ async def lifespan(app: FastAPI):
     # shared BGE instance and the async session factory are passed in.
     shared_embeddings = build_shared_embeddings()
     session_factory = get_async_session_factory()
+    app.state.ticket_verification_service = TicketVerificationService(
+        session_factory, SMTPEmailSender(EmailSettings())
+    )
     service = await build_chat_service(
         checkpointer=checkpointer,
         shared_embeddings=shared_embeddings,

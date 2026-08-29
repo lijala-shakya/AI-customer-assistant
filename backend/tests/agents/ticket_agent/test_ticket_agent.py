@@ -79,10 +79,22 @@ class TestCreateTicket:
         second = create_ticket(pending, "buyer@company.org")
         assert first.ticket_id != second.ticket_id
 
-    def test_priority_defaults_to_none(self) -> None:
-        pending = call("some query")
-        ticket = create_ticket(pending, "buyer@company.org")
-        assert ticket.priority is None
+    @pytest.mark.parametrize(
+        ("reason", "priority"),
+        [
+            ("Our website is down", "CRITICAL"),
+            ("I was charged twice", "HIGH"),
+            ("I would like to schedule a product demo meeting", "MEDIUM"),
+            ("Can I place a bulk order of 500 units?", "MEDIUM"),
+            ("What is the price of this product?", "LOW"),
+            ("I need help with my order", "MEDIUM"),
+        ],
+    )
+    def test_assigns_priority_from_ticket_reason(
+        self, reason: str, priority: str
+    ) -> None:
+        ticket = create_ticket(call(reason), "buyer@company.org")
+        assert ticket.priority == priority
 
     def test_invalid_email_raises_and_no_ticket_is_created(self) -> None:
         pending = call("some query")

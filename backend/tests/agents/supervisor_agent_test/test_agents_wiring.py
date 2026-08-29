@@ -374,7 +374,8 @@ def test_safety_gate_ungraded_pauses_with_escalation_confirmation():
     assert declined["final_response"] == declined["downstream_result"]["response"]
 
 
-def test_safety_gate_ungraded_after_confirm_escalates():
+@pytest.mark.asyncio
+async def test_safety_gate_ungraded_after_confirm_escalates():
     """Customer confirms -> the ESCALATE branch of the post-downstream edge
     fires, the Ticket Agent opens a ticket and interrupt()s for the email;
     on resume it produces a real Ticket + non-null final_response."""
@@ -396,7 +397,7 @@ def test_safety_gate_ungraded_after_confirm_escalates():
     )
 
     config = {"configurable": {"thread_id": "safety-confirm"}}
-    graph.invoke(
+    await graph.ainvoke(
         {
             "user_message": "What is the refund policy?",
             "conversation_history": [],
@@ -404,18 +405,25 @@ def test_safety_gate_ungraded_after_confirm_escalates():
         },
         config=config,
     )
-    email_interrupt = graph.invoke(Command(resume=True), config=config)
+    reason_interrupt = await graph.ainvoke(Command(resume=True), config=config)
+    assert "__interrupt__" in reason_interrupt
+    (reason_payload,) = reason_interrupt["__interrupt__"]
+    assert reason_payload.value["type"] == "ticket-reason"
+
+    email_interrupt = await graph.ainvoke(
+        Command(resume="I need help with my refund."), config=config
+    )
     assert "__interrupt__" in email_interrupt
     (email_payload,) = email_interrupt["__interrupt__"]
     assert email_payload.value["type"] == "email-collection"
 
-    ticket = graph.invoke(
+    ticket = await graph.ainvoke(
         Command(resume="customer@example.com"), config=config
     )
     assert ticket["downstream_result"]["status"] == "GROUNDED"
     assert ticket["final_response"] is not None
     assert "customer@example.com" in ticket["final_response"]
-    assert "What is the refund policy?" in fake_ticket_ops.called_with_query
+    assert "I need help with my refund." in fake_ticket_ops.called_with_query
     assert len(fake_ticket_ops.created) == 1
     assert fake_ticket_ops.created[0].email == "customer@example.com"
 

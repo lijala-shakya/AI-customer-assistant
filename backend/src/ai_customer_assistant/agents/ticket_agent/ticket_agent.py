@@ -36,6 +36,38 @@ from agents.ticket_agent.types import PendingTicket, Ticket
 from agents.ticket_agent.validation import validate_email
 
 
+def _assign_priority(query: str) -> str:
+    """Assign a support priority from the customer's stated reason."""
+    text = query.lower()
+
+    if any(term in text for term in (
+        "security", "hacked", "breach", "fraud", "data loss",
+        "website down", "website is down", "site down", "site is down",
+        "system down", "system is down", "cannot access",
+    )):
+        return "CRITICAL"
+
+    if any(term in text for term in (
+        "urgent", "payment failed", "charged twice", "refund",
+        "login issue", "not working",
+    )):
+        return "HIGH"
+
+    if any(term in text for term in (
+        "meeting", "call", "demo", "consultation", "appointment",
+        "product amount", "quantity", "bulk order", "order amount",
+        "how many", "availability",
+    )):
+        return "MEDIUM"
+
+    if any(term in text for term in (
+        "pricing", "price", "quote", "feature", "question",
+    )):
+        return "LOW"
+
+    return "MEDIUM"
+
+
 def call(query: str) -> PendingTicket:
     """
     Open a ticket for ``query``.
@@ -75,7 +107,7 @@ def create_ticket(pending: PendingTicket, email: str) -> Ticket:
         ticket_id=str(uuid.uuid4()),
         email=normalized_email,
         query=pending.query,
-        priority=None,
+        priority=_assign_priority(pending.query),
     )
 
 

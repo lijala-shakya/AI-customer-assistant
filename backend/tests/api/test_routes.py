@@ -74,13 +74,19 @@ async def test_chat_roundtrip_persists_thread(service_app):
         "/chat",
         json={"thread_id": "thread-t2", "message": "I need a refund"},
     )
-    assert "email" in first.json()["reply"].lower()
+    assert "why" in first.json()["reply"].lower()
 
     second = await client.post(
         "/chat",
+        json={"thread_id": "thread-t2", "message": "I was charged twice."},
+    )
+    assert "email" in second.json()["reply"].lower()
+
+    third = await client.post(
+        "/chat",
         json={"thread_id": "thread-t2", "message": "customer@example.com"},
     )
-    second_body = second.json()
-    assert "ticket" in second_body["reply"].lower()
-    assert second_body["trace_id"] != first.json()["trace_id"]
+    third_body = third.json()
+    assert "ticket" in third_body["reply"].lower()
+    assert third_body["trace_id"] != first.json()["trace_id"]
     await client.aclose()

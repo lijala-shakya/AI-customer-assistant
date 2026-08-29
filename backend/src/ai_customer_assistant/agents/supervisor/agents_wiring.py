@@ -17,6 +17,7 @@ the Supervisor graph.
 from __future__ import annotations
 
 import asyncio
+import inspect
 from typing import Any, Callable, Mapping, Optional
 
 from langgraph.config import get_config
@@ -243,9 +244,9 @@ def make_ticket_agent_node(
          ``interrupt()``s for the email (the checkpointer persists the paused
          state keyed by ``thread_id`` — no ``pending_ticket`` state field is
          needed);
-      2. resume turn: ``ticket_ops.create_ticket(pending, email, key)`` -> a
-         real ``Ticket``, rendered as a DOWNSTREAM_RESULT-style confirmation
-         the Supervisor's FINALIZE edge turns into ``final_response``.
+      2. resume turn: the production store sends a one-time verification link.
+         The ticket is persisted only when that link is consumed. Legacy
+         injected stores can still create immediately for isolated tests.
 
     Idempotency (Phase 4): the adapter derives an ``idempotency_key`` from the
     runtime config (client ``request_id``, else ``thread_id`` + per-thread
@@ -260,8 +261,30 @@ def make_ticket_agent_node(
     never reaches this node.
     """
     def ticket_agent(state: SupervisorState) -> dict:
-        query = state.get("user_message", "")
+        reason = interrupt(
+            {
+                "type": "ticket-reason",
+                "question": "Please briefly describe why you need to create this ticket.",
+            }
+        )
+        return {"ticket_reason": str(reason).strip()}
+
+    return ticket_agent
+
+
+def make_ticket_email_node(
+    ticket_ops: TicketOps,
+) -> Callable[[SupervisorState], dict]:
+    """Collect the email and request verification for a saved ticket reason.
+
+    This is deliberately a separate graph node from the reason prompt. Each
+    node has only one interrupt, so every resume is unambiguous with both
+    in-memory and PostgreSQL checkpointers.
+    """
+    async def ticket_email(state: SupervisorState) -> dict:
+        query = str(state.get("ticket_reason") or state.get("user_message", "")).strip()
         pending = ticket_ops.call(query)
+
         email = interrupt(
             {
                 "type": "email-collection",
@@ -270,13 +293,26 @@ def make_ticket_agent_node(
         )
         configurable = (get_config() or {}).get("configurable", {})
         key = _idempotency_key(configurable, ticket_ops)
-        ticket = ticket_ops.create_ticket(
-            pending, email, idempotency_key=key
-        )
-        confirmation = (
-            f"Your ticket has been created (ID {ticket.ticket_id}). "
-            f"We'll follow up with you at {ticket.email}."
-        )
+        request_verification = getattr(ticket_ops, "request_verification", None)
+        if callable(request_verification):
+            verified_email = request_verification(
+                pending, email, thread_id=str(configurable.get("thread_id", "unknown-thread"))
+            )
+            if inspect.isawaitable(verified_email):
+                verified_email = await verified_email
+            confirmation = (
+                f"We've sent a verification link to {verified_email}. "
+                "Click it to create your ticket."
+            )
+        else:
+            # Compatibility path for explicitly injected legacy/test stores.
+            ticket = ticket_ops.create_ticket(pending, email, idempotency_key=key)
+            if inspect.isawaitable(ticket):
+                ticket = await ticket
+            confirmation = (
+                f"Your ticket has been created (ID {ticket.ticket_id}). "
+                f"We'll follow up with you at {ticket.email}."
+            )
         return {
             "downstream_result": {
                 "status": "GROUNDED",
@@ -285,4 +321,4 @@ def make_ticket_agent_node(
             }
         }
 
-    return ticket_agent
+    return ticket_email

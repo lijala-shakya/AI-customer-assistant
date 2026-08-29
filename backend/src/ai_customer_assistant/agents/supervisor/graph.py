@@ -23,6 +23,7 @@ from .agents_wiring import (
     make_knowledge_agent_node,
     make_safety_gate_node,
     make_ticket_agent_node,
+    make_ticket_email_node,
 )
 from .llm_client import StubSupervisorLLMClient, SupervisorLLMClient
 from .node import assemble_response_node, make_classify_and_route_node
@@ -35,6 +36,7 @@ ASSEMBLE_NODE = "assemble_response"
 KNOWLEDGE_AGENT_NODE = "knowledge_agent"
 SAFETY_GATE_NODE = "safety_gate"
 TICKET_AGENT_NODE = "ticket_agent"
+TICKET_EMAIL_NODE = "ticket_email"
 
 # Where classification/post-downstream routing can send the conversation.
 _ROUTE_TARGETS = {
@@ -174,6 +176,10 @@ def build_supervisor_graph(
         ),
     )
     graph.add_node(
+        TICKET_EMAIL_NODE,
+        make_ticket_email_node(ticket_ops if ticket_ops is not None else TicketStore()),
+    )
+    graph.add_node(
         SAFETY_GATE_NODE,
         safety_gate_node
         or make_safety_gate_node(groundedness_check=groundedness_check),
@@ -186,8 +192,9 @@ def build_supervisor_graph(
     graph.add_conditional_edges(
         SAFETY_GATE_NODE, _route_after_downstream, _POST_DOWNSTREAM_TARGETS
     )
+    graph.add_edge(TICKET_AGENT_NODE, TICKET_EMAIL_NODE)
     graph.add_conditional_edges(
-        TICKET_AGENT_NODE, _route_after_downstream, _POST_DOWNSTREAM_TARGETS
+        TICKET_EMAIL_NODE, _route_after_downstream, _POST_DOWNSTREAM_TARGETS
     )
     graph.add_edge(ASSEMBLE_NODE, END)
 

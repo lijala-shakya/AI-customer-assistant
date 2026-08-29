@@ -87,4 +87,5 @@ class SupervisorState(TypedDict, total=False):
     clarification_attempts: int
     next_agent: Optional[NextAgent]
     ticket_type: Optional[TicketType]
+    ticket_reason: Optional[str]
     final_response: Optional[str]
