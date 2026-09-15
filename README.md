@@ -35,19 +35,19 @@ Built with **FastAPI + LangGraph + PostgreSQL (pgvector) + MinIO + Tika** on the
 
 ```mermaid
 flowchart LR
-    U([User / Customer]) -->|POST /chat {thread_id, message}| S[Supervisor Agent<br/>classify → route]
-    S -->|KNOWLEDGE_QUERY| K[Knowledge Agent<br/>hybrid RAG]
-    K --> G[Safety Gate<br/>groundedness check]
-    G -->|grounded| A[assemble_response → reply]
-    G -->|ungrounded| E[Escalation confirm interrupt]
-    E -->|yes| T[Ticket Agent<br/>email interrupt → create]
-    S -->|CREATE_TICKET| T
+    U(["User / Customer"]) -- "POST /chat" --> S["Supervisor Agent - classify and route"]
+    S -- "KNOWLEDGE_QUERY" --> K["Knowledge Agent - hybrid RAG"]
+    K --> G["Safety Gate - groundedness check"]
+    G -- "grounded" --> A["assemble_response to reply"]
+    G -- "ungrounded" --> E["Escalation confirm interrupt"]
+    E -- "yes" --> T["Ticket Agent - email interrupt to create"]
+    S -- "CREATE_TICKET" --> T
     A --> U
 
-    AD([Admin]) -->|upload / crawl| DIP[Ingestion Pipeline<br/>Tika → chunk → embed]
-    DIP -->|indexes| DB[(Postgres + pgvector<br/>+ EAV graph)]
-    DIP -->|stores files| M[(MinIO S3)]
-    K -->|retrieves| DB
+    AD(["Admin"]) -- "upload / crawl" --> DIP["Ingestion Pipeline - Tika to chunk to embed"]
+    DIP -- "indexes" --> DB[("Postgres plus pgvector plus EAV graph")]
+    DIP -- "stores files" --> M[("MinIO S3")]
+    K -- "retrieves" --> DB
 ```
 
 **Request flow:** client only sends `{thread_id, message}` — history lives in Postgres checkpointer (falls back to in-memory `MemorySaver` in dev/tests).
