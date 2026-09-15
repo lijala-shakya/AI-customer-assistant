@@ -26,8 +26,8 @@ from fastapi import APIRouter, Depends, HTTPException, Query
 from pydantic import BaseModel
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from db.session import database_url
-from ingestion.graph.queries import (
+from ai_customer_assistant.db.session import database_url
+from ai_customer_assistant.ingestion.graph.queries import (
     EntityDetail,
     EntityRef,
     FactRef,

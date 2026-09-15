@@ -220,7 +220,7 @@ def test_graph_unknown_exhausted_reaches_ticket_agent():
     assert result["clarification_attempts"] == 3
     assert "__interrupt__" in result
     (interrupt_payload,) = result["__interrupt__"]
-    assert interrupt_payload.value["type"] == "email-collection"
+    assert interrupt_payload.value["type"] == "ticket-reason"
 
 
 # ---------------------------------------------------------------------------

@@ -317,7 +317,8 @@ class KnowledgeInjectionJob(Base):
     triggered_by: Mapped[str] = mapped_column(Text, nullable=False)
     chunks_created_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
     entities_created_count: Mapped[int | None] = mapped_column(Integer, nullable=True)
-
+    created_at: Mapped[datetime] = mapped_column(nullable=False, server_default=func.now())
+    attempts: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0", default=0)
     source: Mapped["KnowledgeSource"] = relationship(back_populates="jobs")
     version: Mapped["KnowledgeSourceVersion | None"] = relationship(back_populates="jobs")
 
@@ -349,3 +350,7 @@ class TicketVerification(Base):
     expires_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False)
     used_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
     created_at: Mapped[datetime] = mapped_column(DateTime(timezone=True), nullable=False, server_default=func.now())
+    resend_count: Mapped[int] = mapped_column(Integer, nullable=False, server_default="0", default=0)
+    send_attempts: Mapped[int] = mapped_column(Integer, nullable=False, server_default="1", default=1)
+    last_sent_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)
+    verified_at: Mapped[datetime | None] = mapped_column(DateTime(timezone=True), nullable=True)

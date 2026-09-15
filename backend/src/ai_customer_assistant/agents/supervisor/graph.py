@@ -168,17 +168,19 @@ def build_supervisor_graph(
             else _placeholder_agent_node("Knowledge Agent")
         ),
     )
-    graph.add_node(
-        TICKET_AGENT_NODE,
-        ticket_agent_node
-        or make_ticket_agent_node(
-            ticket_ops if ticket_ops is not None else TicketStore()
-        ),
-    )
-    graph.add_node(
-        TICKET_EMAIL_NODE,
-        make_ticket_email_node(ticket_ops if ticket_ops is not None else TicketStore()),
-    )
+    if ticket_agent_node is not None:
+        graph.add_node(TICKET_AGENT_NODE, ticket_agent_node)
+    else:
+        graph.add_node(
+            TICKET_AGENT_NODE,
+            make_ticket_agent_node(
+                ticket_ops if ticket_ops is not None else TicketStore()
+            ),
+        )
+        graph.add_node(
+            TICKET_EMAIL_NODE,
+            make_ticket_email_node(ticket_ops if ticket_ops is not None else TicketStore()),
+        )
     graph.add_node(
         SAFETY_GATE_NODE,
         safety_gate_node
@@ -192,10 +194,15 @@ def build_supervisor_graph(
     graph.add_conditional_edges(
         SAFETY_GATE_NODE, _route_after_downstream, _POST_DOWNSTREAM_TARGETS
     )
-    graph.add_edge(TICKET_AGENT_NODE, TICKET_EMAIL_NODE)
-    graph.add_conditional_edges(
-        TICKET_EMAIL_NODE, _route_after_downstream, _POST_DOWNSTREAM_TARGETS
-    )
+    if ticket_agent_node is not None:
+        graph.add_conditional_edges(
+            TICKET_AGENT_NODE, _route_after_downstream, _POST_DOWNSTREAM_TARGETS
+        )
+    else:
+        graph.add_edge(TICKET_AGENT_NODE, TICKET_EMAIL_NODE)
+        graph.add_conditional_edges(
+            TICKET_EMAIL_NODE, _route_after_downstream, _POST_DOWNSTREAM_TARGETS
+        )
     graph.add_edge(ASSEMBLE_NODE, END)
 
     return graph.compile(checkpointer=checkpointer)

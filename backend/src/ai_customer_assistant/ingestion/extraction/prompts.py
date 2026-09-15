@@ -3,7 +3,7 @@ Prompt text is data, not logic -- kept out of agent.py so it can be tuned
 independently of the orchestration code.
 """
 
-from ingestion.extraction.ontology import formatted_ontology_reference
+from ai_customer_assistant.ingestion.extraction.ontology import formatted_ontology_reference
 
 _SYSTEM_PROMPT = """\
 You extract structured facts from a single chunk of a company knowledge-base

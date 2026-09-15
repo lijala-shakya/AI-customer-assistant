@@ -39,9 +39,9 @@ import httpx
 from langchain_groq import ChatGroq
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from ingestion.chunk_embed.types import ExtractedDocument as ChunkerDocument
-from ingestion.extraction.agent import ExtractionAgent, extract_document
-from ingestion.pipeline_types import (
+from ai_customer_assistant.ingestion.chunk_embed.types import ExtractedDocument as ChunkerDocument
+from ai_customer_assistant.ingestion.extraction.agent import ExtractionAgent, extract_document
+from ai_customer_assistant.ingestion.pipeline_types import (
     ChunkExtraction,
     ExtractedDocument,
     FileType,
@@ -51,14 +51,14 @@ from ingestion.pipeline_types import (
     JobStatus,
     VersionStatus,
 )
-from ingestion.queue import repository as job_repo
-from ingestion.result import Err, Ok, Result, run_pipeline
-from ingestion.tika.client import (
+from ai_customer_assistant.ingestion.queue import repository as job_repo
+from ai_customer_assistant.ingestion.result import Err, Ok, Result, run_pipeline
+from ai_customer_assistant.ingestion.tika.client import (
     TikaExtractionError,
     TikaTransientError,
     extract_text,
 )
-from ingestion.tika.config import TikaSettings
+from ai_customer_assistant.ingestion.tika.config import TikaSettings
 
 FetchBytes = Callable[[str], Awaitable[bytes]]
 ChunkAndEmbed = Callable[[ChunkerDocument], Awaitable[tuple]]  # -> tuple[EmbeddedChunk, ...]

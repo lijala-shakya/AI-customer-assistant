@@ -15,13 +15,13 @@ from sqlalchemy import func, select
 from sqlalchemy.ext.asyncio import AsyncSession
 from sqlalchemy.orm import aliased
 
-from db.models import (
+from ai_customer_assistant.db.models import (
     EmbeddingChunk,
     KnowledgeInjectionJob,
     KnowledgeSource,
     KnowledgeSourceVersion,
 )
-from ingestion.pipeline_types import (
+from ai_customer_assistant.ingestion.pipeline_types import (
     FileType,
     JobRef,
     JobStatus,

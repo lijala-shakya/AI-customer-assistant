@@ -18,6 +18,7 @@ from __future__ import annotations
 
 import asyncio
 import inspect
+import logging
 from typing import Any, Callable, Mapping, Optional
 
 from langgraph.config import get_config
@@ -202,6 +203,23 @@ def make_safety_gate_node(
 
 TicketOps = Callable[[], Any]
 
+logger = logging.getLogger(__name__)
+
+
+def _format_email_error(exc: BaseException) -> str:
+    """Render the exact underlying email failure (type + message)."""
+    parts: list[str] = []
+    for arg in getattr(exc, "args", ()):
+        if isinstance(arg, bytes):
+            try:
+                parts.append(arg.decode("utf-8", errors="replace"))
+            except Exception:
+                parts.append(repr(arg))
+        else:
+            parts.append(str(arg))
+    detail = " ".join(p for p in parts if p).strip() or str(exc)
+    return f"{type(exc).__name__}: {detail}"
+
 
 def _idempotency_key(
     configurable: Mapping[str, Any],
@@ -295,11 +313,25 @@ def make_ticket_email_node(
         key = _idempotency_key(configurable, ticket_ops)
         request_verification = getattr(ticket_ops, "request_verification", None)
         if callable(request_verification):
-            verified_email = request_verification(
-                pending, email, thread_id=str(configurable.get("thread_id", "unknown-thread"))
-            )
-            if inspect.isawaitable(verified_email):
-                verified_email = await verified_email
+            try:
+                verified_email = request_verification(
+                    pending, email, thread_id=str(configurable.get("thread_id", "unknown-thread"))
+                )
+                if inspect.isawaitable(verified_email):
+                    verified_email = await verified_email
+            except Exception as exc:  # noqa: BLE001 - must surface exact cause, not 500
+                logger.exception("Ticket verification email failed")
+                exact = _format_email_error(exc)
+                return {
+                    "downstream_result": {
+                        "status": "GROUNDED",
+                        "response": (
+                            "Could not send verification email. "
+                            f"Exact error: {exact}"
+                        ),
+                        "customer_wants_escalation": False,
+                    }
+                }
             confirmation = (
                 f"We've sent a verification link to {verified_email}. "
                 "Click it to create your ticket."

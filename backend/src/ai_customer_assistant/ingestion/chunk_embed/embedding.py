@@ -24,7 +24,7 @@ from __future__ import annotations
 
 from sentence_transformers import SentenceTransformer
 
-from ingestion.chunk_embed.types import Chunk, EmbeddedChunk
+from ai_customer_assistant.ingestion.chunk_embed.types import Chunk, EmbeddedChunk
 
 
 class EmbeddingError(Exception):

@@ -6,8 +6,8 @@ from fastapi import APIRouter, Depends
 from pydantic import BaseModel, Field
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.async_session import get_session
-from services.chat_service import answer
+from ai_customer_assistant.db.async_session import get_session
+from ai_customer_assistant.services.chat_service import answer
 
 router = APIRouter(prefix="/chat", tags=["chat"])
 

@@ -1,4 +1,4 @@
-from ingestion.extraction.agent import (
+from ai_customer_assistant.ingestion.extraction.agent import (
     build_extraction_agent,
     extract_chunk,
 )

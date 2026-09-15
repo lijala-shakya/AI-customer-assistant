@@ -23,22 +23,22 @@ from uuid import UUID, uuid4
 from sqlalchemy import select
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.models import (
+from ai_customer_assistant.db.models import (
     KnowledgeInjectionJob,
     KnowledgeSource,
     KnowledgeSourceVersion,
 )
-from ingestion.dedup import (
+from ai_customer_assistant.ingestion.dedup import (
     DuplicateContent,
     NewDocument,
     NewVersion,
     classify_upload,
     compute_checksum,
 )
-from ingestion.storage.client import StorageClient, StorageConfig
-from ingestion.storage.config import ORIGIN_WEB_CRAWL
-from ingestion.storage.keys import build_key
-from ingestion.pipeline_types import (
+from ai_customer_assistant.ingestion.storage.client import StorageClient, StorageConfig
+from ai_customer_assistant.ingestion.storage.config import ORIGIN_WEB_CRAWL
+from ai_customer_assistant.ingestion.storage.keys import build_key
+from ai_customer_assistant.ingestion.pipeline_types import (
     FileType,
     JobRef,
     JobStatus,

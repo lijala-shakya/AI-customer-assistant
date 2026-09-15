@@ -19,7 +19,7 @@ from sqlalchemy import func, select
 from sqlalchemy.dialects.postgresql import insert as pg_insert
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.models import (
+from ai_customer_assistant.db.models import (
     Attribute,
     Entity,
     EmbeddingChunk,
@@ -27,8 +27,8 @@ from db.models import (
     Relation,
     Value,
 )
-from ingestion.extraction.ontology import safe_canonicalize_entity_type
-from ingestion.pipeline_types import ChunkExtraction
+from ai_customer_assistant.ingestion.extraction.ontology import safe_canonicalize_entity_type
+from ai_customer_assistant.ingestion.pipeline_types import ChunkExtraction
 
 
 def compute_chunk_checksum(text: str) -> str:

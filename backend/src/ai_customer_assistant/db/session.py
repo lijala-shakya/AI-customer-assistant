@@ -1,12 +1,27 @@
 import os
 from contextlib import contextmanager, asynccontextmanager
 from functools import lru_cache
+from pathlib import Path
 from typing import AsyncIterator, Iterator
 
 from sqlalchemy import create_engine
 from sqlalchemy.engine import Engine
 from sqlalchemy.ext.asyncio import AsyncEngine, AsyncSession, async_sessionmaker, create_async_engine
 from sqlalchemy.orm import Session, sessionmaker
+
+
+# Load .env file if it exists
+_env_file = Path(__file__).resolve().parents[2] / ".env"
+if _env_file.exists():
+    with open(_env_file) as f:
+        for line in f:
+            line = line.strip()
+            if line and not line.startswith("#") and "=" in line:
+                key, value = line.split("=", 1)
+                key = key.strip()
+                value = value.strip().strip('"\'')
+                if key and key not in os.environ:
+                    os.environ[key] = value
 
 
 def database_url() -> str:

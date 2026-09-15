@@ -37,15 +37,15 @@ from typing import Any, Callable, Mapping, Optional, Sequence
 from langgraph.types import Command
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from agents.contracts import ConversationTurn
-from agents.knowledge.config import KnowledgeAgentConfig
-from agents.knowledge.graph import build_knowledge_agent_graph
-from agents.knowledge.providers import build_knowledge_provider, llm_completions
-from agents.supervisor.graph import build_supervisor_graph
-from agents.supervisor.llm_client import SupervisorLLMClient, build_llm_client
-from agents.ticket_agent.store import PostgresTicketStore, TicketStore
-from db.checkpointer import build_checkpointer
-from services.embeddings import SharedEmbeddings
+from ai_customer_assistant.agents.contracts import ConversationTurn
+from ai_customer_assistant.agents.knowledge.config import KnowledgeAgentConfig
+from ai_customer_assistant.agents.knowledge.graph import build_knowledge_agent_graph
+from ai_customer_assistant.agents.knowledge.providers import build_knowledge_provider, llm_completions
+from ai_customer_assistant.agents.supervisor.graph import build_supervisor_graph
+from ai_customer_assistant.agents.supervisor.llm_client import SupervisorLLMClient, build_llm_client
+from ai_customer_assistant.agents.ticket_agent.store import PostgresTicketStore, TicketStore
+from ai_customer_assistant.db.checkpointer import build_checkpointer
+from ai_customer_assistant.services.embeddings import SharedEmbeddings
 
 _EMAIL_COLLECTION_QUESTION = (
     "To create your ticket I first need your email address. "

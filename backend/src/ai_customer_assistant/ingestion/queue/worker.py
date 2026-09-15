@@ -15,10 +15,10 @@ from typing import Awaitable, Callable
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from ingestion.pipeline import run_delete, run_ingestion
-from ingestion.pipeline_types import JobOutcome, JobRef, JobStatus, JobType
-from ingestion.queue import repository
-from ingestion.queue.config import PGQueueSettings
+from ai_customer_assistant.ingestion.pipeline import run_delete, run_ingestion
+from ai_customer_assistant.ingestion.pipeline_types import JobOutcome, JobRef, JobStatus, JobType
+from ai_customer_assistant.ingestion.queue import repository
+from ai_customer_assistant.ingestion.queue.config import PGQueueSettings
 
 logger = logging.getLogger(__name__)
 

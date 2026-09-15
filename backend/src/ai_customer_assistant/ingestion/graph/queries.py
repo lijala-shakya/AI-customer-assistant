@@ -27,7 +27,7 @@ from uuid import UUID
 from sqlalchemy import select, text
 from sqlalchemy.ext.asyncio import AsyncSession
 
-from db.models import Attribute, Entity, Relation, Value
+from ai_customer_assistant.db.models import Attribute, Entity, Relation, Value
 
 
 @dataclass(frozen=True, slots=True)

@@ -32,8 +32,8 @@ from __future__ import annotations
 
 import uuid
 
-from agents.ticket_agent.types import PendingTicket, Ticket
-from agents.ticket_agent.validation import validate_email
+from ai_customer_assistant.agents.ticket_agent.types import PendingTicket, Ticket
+from ai_customer_assistant.agents.ticket_agent.validation import validate_email
 
 
 def _assign_priority(query: str) -> str:

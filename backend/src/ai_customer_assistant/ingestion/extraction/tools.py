@@ -16,18 +16,18 @@ from __future__ import annotations
 from functools import reduce
 from typing import Any
 
-from ingestion.extraction.ontology import (
+from ai_customer_assistant.ingestion.extraction.ontology import (
     safe_canonicalize_attribute,
     safe_canonicalize_entity_type,
     safe_canonicalize_relation_type,
 )
-from ingestion.extraction.schema import (
+from ai_customer_assistant.ingestion.extraction.schema import (
     NoFactFound,
     RecordAttributeValueArgs,
     RecordRelationArgs,
     ResolveEntityArgs,
 )
-from ingestion.pipeline_types import (
+from ai_customer_assistant.ingestion.pipeline_types import (
     ChunkExtraction,
     ExtractedFact,
     ExtractedRelation,

@@ -51,8 +51,8 @@ import re
 
 from sentence_transformers import SentenceTransformer
 
-from agents.safety_agent.types import GroundednessResult, SentenceScore
-from ingestion.chunk_embed.types import EmbeddedChunk
+from ai_customer_assistant.agents.safety_agent.types import GroundednessResult, SentenceScore
+from ai_customer_assistant.ingestion.chunk_embed.types import EmbeddedChunk
 
 # Default per-sentence similarity threshold and aggregation cutoff, per
 # project decision. Both are plain function defaults (not hardcoded

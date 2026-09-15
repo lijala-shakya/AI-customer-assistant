@@ -35,8 +35,8 @@ formatting must happen upstream of this module, not inside it.
 
 from __future__ import annotations
 
-from agents.safety_agent.fallback_response import generate_fallback_response
-from agents.safety_agent.types import GroundednessResult
+from ai_customer_assistant.agents.safety_agent.fallback_response import generate_fallback_response
+from ai_customer_assistant.agents.safety_agent.types import GroundednessResult
 
 STATUS_GROUNDED = "GROUNDED"
 STATUS_UNGROUNDED = "UNGROUNDED"

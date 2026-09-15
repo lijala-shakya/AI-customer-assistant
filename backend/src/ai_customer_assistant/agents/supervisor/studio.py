@@ -37,9 +37,9 @@ from typing import Any, Mapping
 
 from langgraph.checkpoint.memory import MemorySaver
 
-from agents.knowledge.types import GroundedResponse
-from agents.supervisor.graph import build_supervisor_graph
-from agents.ticket_agent.store import TicketStore
+from ai_customer_assistant.agents.knowledge.types import GroundedResponse
+from ai_customer_assistant.agents.supervisor.graph import build_supervisor_graph
+from ai_customer_assistant.agents.ticket_agent.store import TicketStore
 
 
 class _StudioLLMClient:

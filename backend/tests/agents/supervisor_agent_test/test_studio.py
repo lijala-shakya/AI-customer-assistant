@@ -16,6 +16,7 @@ EXPECTED_NODES = frozenset(
         "knowledge_agent",
         "safety_gate",
         "ticket_agent",
+        "ticket_email",
         "assemble_response",
     }
 )

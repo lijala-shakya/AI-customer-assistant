@@ -21,11 +21,11 @@ from uuid import UUID
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker
 
-from agents.ticket_agent.ticket_agent import call as _call
-from agents.ticket_agent.ticket_agent import create_ticket as _build_ticket
-from agents.ticket_agent.types import PendingTicket, Ticket
-from db.models import Ticket as TicketRecord
-from services.ticket_verification import EmailSettings, SMTPEmailSender, TicketVerificationService
+from ai_customer_assistant.agents.ticket_agent.ticket_agent import call as _call
+from ai_customer_assistant.agents.ticket_agent.ticket_agent import create_ticket as _build_ticket
+from ai_customer_assistant.agents.ticket_agent.types import PendingTicket, Ticket
+from ai_customer_assistant.db.models import Ticket as TicketRecord
+from ai_customer_assistant.services.ticket_verification import EmailSettings, SMTPEmailSender, TicketVerificationService
 
 
 class TicketStore:

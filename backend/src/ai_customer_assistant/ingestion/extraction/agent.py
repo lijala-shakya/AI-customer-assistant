@@ -14,15 +14,15 @@ from typing import Protocol
 
 from langchain_core.messages import SystemMessage, HumanMessage
 
-from ingestion.extraction.prompts import (
+from ai_customer_assistant.ingestion.extraction.prompts import (
     CHUNK_TASK_TEMPLATE,
     SYSTEM_PROMPT,
 )
-from ingestion.extraction.tools import (
+from ai_customer_assistant.ingestion.extraction.tools import (
     TOOL_DEFS,
     tool_calls_to_extraction,
 )
-from ingestion.pipeline_types import ChunkExtraction
+from ai_customer_assistant.ingestion.pipeline_types import ChunkExtraction
 
 
 class ToolCallingChatModel(Protocol):

@@ -65,12 +65,12 @@ from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 # sys.path. Any entry point that is not pytest -- for example
 # `python backend/scripts/crawl_and_ingest.py` -- has no such injection and
 # fails with ModuleNotFoundError: No module named 'ingestion'.
-from ingestion.chunk_embed.tokenizer import (
+from ai_customer_assistant.ingestion.chunk_embed.tokenizer import (
     count_tokens,
     decode,
     encode,
 )
-from ingestion.chunk_embed.types import (
+from ai_customer_assistant.ingestion.chunk_embed.types import (
     Chunk,
     ExtractedDocument,
     HeadingMarker,

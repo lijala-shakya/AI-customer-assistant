@@ -27,7 +27,7 @@ from typing import Optional, Sequence
 
 from sentence_transformers import SentenceTransformer
 
-from agents.knowledge.constants import DEFAULT_EMBEDDING_MODEL_NAME
+from ai_customer_assistant.agents.knowledge.constants import DEFAULT_EMBEDDING_MODEL_NAME
 
 
 class SharedEmbeddings:

@@ -16,7 +16,7 @@ from html import escape
 from fastapi import APIRouter, Query, Request
 from fastapi.responses import HTMLResponse
 
-from schemas.chat import ChatRequest, ChatResponse
+from ai_customer_assistant.schemas.chat import ChatRequest, ChatResponse
 
 router = APIRouter(tags=["chat"])
 

@@ -27,10 +27,10 @@ from __future__ import annotations
 from sentence_transformers import SentenceTransformer
 from transformers.tokenization_utils_base import PreTrainedTokenizerBase
 
-from ingestion.chunk_embed.chunking import PageRangeResolver, chunk_document
-from ingestion.chunk_embed.config import IngestionSettings
-from ingestion.chunk_embed.embedding import embed_chunks
-from ingestion.chunk_embed.types import EmbeddedChunk, ExtractedDocument
+from ai_customer_assistant.ingestion.chunk_embed.chunking import PageRangeResolver, chunk_document
+from ai_customer_assistant.ingestion.chunk_embed.config import IngestionSettings
+from ai_customer_assistant.ingestion.chunk_embed.embedding import embed_chunks
+from ai_customer_assistant.ingestion.chunk_embed.types import EmbeddedChunk, ExtractedDocument
 
 
 def process_document(

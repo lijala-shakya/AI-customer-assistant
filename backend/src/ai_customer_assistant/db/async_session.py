@@ -11,7 +11,7 @@ from typing import AsyncGenerator
 
 from sqlalchemy.ext.asyncio import AsyncSession, async_sessionmaker, create_async_engine
 
-from db.session import database_url
+from ai_customer_assistant.db.session import database_url
 
 
 def async_database_url() -> str:

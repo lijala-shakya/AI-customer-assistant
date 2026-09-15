@@ -14,8 +14,8 @@ from __future__ import annotations
 
 import httpx
 
-from ingestion.pipeline_types import ExtractedDocument
-from ingestion.tika.config import TikaSettings
+from ai_customer_assistant.ingestion.pipeline_types import ExtractedDocument
+from ai_customer_assistant.ingestion.tika.config import TikaSettings
 
 
 class TikaExtractionError(Exception):
